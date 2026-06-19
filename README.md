@@ -31,7 +31,7 @@ The video classification framework is divided into two distinct processing phase
        ▼ (Classification Head)
 [Dense Sigmoid Layer] -------------> Binary Classification Output (Real vs. Fake)
 
-
+```
 
 
 1. Spatial Feature Extractor
