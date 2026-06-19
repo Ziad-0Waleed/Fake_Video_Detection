@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DeepFake Detector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Neural Forensics &mdash; AI Detection</div>
+    <h1>DeepFake<br><em>Video Detector</em></h1>
+    <p class="subtitle">Upload a video to analyse its authenticity using EfficientNetB4 + GRU</p>
+
+    <div class="status-bar">
+      <div class="pill" id="api-pill">
+        <span class="dot"></span>
+        <span id="api-pill-text">Connecting&hellip;</span>
+      </div>
+      <div class="pill gold-dot" id="model-pill" style="display:none">
+        <span class="dot"></span>
+        <span id="model-pill-text">&mdash;</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon">&#9635;</div>
+        <span class="card-title">Video Analysis</span>
+      </div>
+
+      <div class="upload-zone" id="drop-zone">
+        <input type="file" id="file-input" accept="video/*"/>
+        <div class="upload-icon">&#127902;</div>
+        <div class="upload-label">
+          <strong>Drop a video here</strong> or click to browse
+        </div>
+        <div class="upload-hint">MP4 &middot; AVI &middot; MOV &middot; WEBM &mdash; max 20 frames analysed</div>
+      </div>
+
+      <div class="video-preview-wrap" id="preview-wrap">
+        <div class="video-meta">
+          <span class="file-name" id="file-name-label">&mdash;</span>
+          <button class="clear-btn" onclick="clearFile()">&times; Clear</button>
+        </div>
+        <video class="preview" id="video-preview" controls></video>
+      </div>
+
+      <div class="log-wrap" id="log-wrap">
+        <div class="log-line"><span class="ts">&rsaquo;</span><span id="log-text">Initialising&hellip;</span></div>
+      </div>
+
+      <div class="error-msg" id="error-msg"></div>
+
+      <div class="btn-wrap">
+        <button class="btn" id="analyse-btn" onclick="analyse()" disabled>
+          <span class="btn-text">Analyse Video</span>
+          <div class="spinner"></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar">
+
+      <div class="info-card">
+        <div class="info-title">Detection Pipeline</div>
+        <div class="info-row"><span class="info-key">Feature Extractor</span><span class="info-val">EfficientNetB4</span></div>
+        <div class="info-row"><span class="info-key">Sequence Model</span><span class="info-val">Stacked GRU</span></div>
+        <div class="info-row"><span class="info-key">Frame Size</span><span class="info-val">380 &times; 380</span></div>
+        <div class="info-row"><span class="info-key">Max Frames</span><span class="info-val">20</span></div>
+        <div class="info-row"><span class="info-key">Feature Dim</span><span class="info-val">1792</span></div>
+        <div class="info-row"><span class="info-key">Threshold</span><span class="info-val gold">0.5 (sigmoid)</span></div>
+      </div>
+
+      <div class="result-card" id="result-card">
+        <div class="result-head">Analysis Result</div>
+        <div class="result-body">
+          <div class="verdict" id="verdict">&mdash;</div>
+          <div class="verdict-sub" id="verdict-sub">&mdash;</div>
+
+          <div class="gauge-label">
+            <span id="gauge-side-label">Fake Probability</span>
+            <span id="gauge-pct">&mdash;</span>
+          </div>
+          <div class="gauge-track">
+            <div class="gauge-fill" id="gauge-fill"></div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-label">Fake Prob.</div>
+              <div class="stat-val" id="s-fake">&mdash;</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Real Prob.</div>
+              <div class="stat-val" id="s-real">&mdash;</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Confidence</div>
+              <div class="stat-val gold" id="s-conf">&mdash;</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Frames Used</div>
+              <div class="stat-val" id="s-frames">&mdash;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="model-info" id="model-info-card">
+        <div class="info-title">Model Info</div>
+        <div class="info-row"><span class="info-key">Architecture</span><span class="info-val" id="mi-type">&mdash;</span></div>
+        <div class="info-row"><span class="info-key">Threshold</span><span class="info-val gold" id="mi-thresh">&mdash;</span></div>
+        <div class="info-row"><span class="info-key">Status</span><span class="info-val" style="color:var(--green)" id="mi-status">&mdash;</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/script.js"></script>
+</body>
+</html>

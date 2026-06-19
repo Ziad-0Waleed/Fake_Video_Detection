@@ -1,0 +1,14 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+Chapter 6 Results VVV.docx
+Chapter 6 Results VVV.pdf
+Chapter 7 Future Work (Video).docx
+TESTING VIDS/
