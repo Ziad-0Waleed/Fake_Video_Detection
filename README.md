@@ -30,3 +30,77 @@ The video classification framework is divided into two distinct processing phase
        │
        ▼ (Classification Head)
 [Dense Sigmoid Layer] -------------> Binary Classification Output (Real vs. Fake)
+
+
+
+
+1. Spatial Feature Extractor
+Backbone: EfficientNetB4 (pre-trained on ImageNet, classification head removed).
+
+Input Resolution: 380×380 pixels, selected as the mathematical sweet spot to preserve fine-grained blending anomalies and edge inconsistencies around facial boundaries without causing memory overhead.
+
+Output: Global Average Pooling compresses spatial dimensions into a dense 1792-dimensional vector per frame.
+
+2. Temporal Sequence Modeler
+Architecture: Stacked Gated Recurrent Unit (GRU) network (64 → 32 → 16 units).
+
+Masking Protocol: Parallel boolean attention masks (frame_masks) track sequence boundaries, forcing downstream layers to disregard zero-padding elements at truncated or shorter timesteps.
+
+Regularization: Interspersed Batch Normalization standardizes intermediate activations, while dual 0.5 Dropout layers mitigate overfitting before the classification boundary.
+
+Output Head: A single-unit Dense layer with Sigmoid activation mapping outputs to a raw probability score [0.0, 1.0].
+
+📊 Dataset & Preprocessing Pipeline
+The model is trained and evaluated using the Deepfake Detection Challenge (DFDC) dataset framework.
+
+Geometry Correction: Videos are dynamically sliced using a customized centering calculation to prevent geometric squishing or aspect ratio distortion.
+
+Sequential Batching: Frame rates are sub-sampled and bound to a strict maximum sequence length threshold to create uniform rectangular tensors.
+
+Imbalance Mitigation: To address the severe scarcity of real media samples, custom cost-sensitive loss weights are injected during compilation, penalizing the misclassification of genuine assets approximately four times harder than fake assets.
+
+🛠️ Installation & Setup
+Prerequisites
+Python 3.10+
+
+CUDA-capable GPU (Recommended for extraction and training)
+
+Local Deployment
+Clone the repository:
+
+Bash
+git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+cd your-repo-name
+Install dependencies:
+
+Bash
+pip install -r requirements.txt
+Run the development environment:
+
+Bash
+python main.py
+🌐 Production API Endpoint
+The architecture exposes a high-performance REST endpoint for seamless integration with full-stack web architectures or localized backends.
+
+Prediction Route
+Endpoint: POST /api/v1/predict
+
+Content-Type: application/json
+
+Sample Payload:
+
+JSON
+{
+  "video_url": "[https://your-s3-storage-bucket.amazonaws.com/sample_video.mp4](https://your-s3-storage-bucket.amazonaws.com/sample_video.mp4)"
+}
+Sample Response:
+
+JSON
+{
+  "status": "success",
+  "prediction": "Fake",
+  "probability": 0.8742,
+  "execution_time_seconds": 1.42
+}
+👥 Team & Acknowledgments
+Developed as part of the TrueScope Multimodal Detection Project graduation thesis. Special thanks to our academic supervisors and project teammates for guiding the system's design and structural engineering principles.
